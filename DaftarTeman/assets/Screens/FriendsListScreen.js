@@ -1,5 +1,5 @@
 // screens/FriendsListScreen.js
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,33 @@ const FriendsListScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [editIndex, setEditIndex] = useState(null);
   const [image, setImage] = useState(null);
+
+  // Callback untuk editFriend menggunakan useCallback
+  const editFriend = useCallback((index) => {
+    setName(friends[index].name);
+    setPhoneNumber(friends[index].phoneNumber);
+    setImage(friends[index].image);
+    setEditIndex(index);
+  }, [friends]);
+
+  // Callback untuk deleteFriend menggunakan useCallback
+  const deleteFriend = useCallback((index) => {
+    Alert.alert(
+      'Delete Friend',
+      'Are you sure you want to delete this friend?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            const updatedFriends = friends.filter((_, i) => i !== index);
+            setFriends(updatedFriends);
+          },
+        },
+      ]
+    );
+  }, [friends]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -42,31 +69,6 @@ const FriendsListScreen = () => {
     setName('');
     setPhoneNumber('');
     setImage(null);
-  };
-
-  const editFriend = (index) => {
-    setName(friends[index].name);
-    setPhoneNumber(friends[index].phoneNumber);
-    setImage(friends[index].image);
-    setEditIndex(index);
-  };
-
-  const deleteFriend = (index) => {
-    Alert.alert(
-      'Delete Friend',
-      'Are you sure you want to delete this friend?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            const updatedFriends = friends.filter((_, i) => i !== index);
-            setFriends(updatedFriends);
-          },
-        },
-      ]
-    );
   };
 
   return (
